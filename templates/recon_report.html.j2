@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Recon Report — {{ target }}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    color: #2c3e50;
+    line-height: 1.6;
+  }
+  .container { max-width: 1000px; margin: 0 auto; background: white; padding: 40px 50px; box-shadow: 0 0 20px rgba(0,0,0,0.07); }
+
+  /* Cover */
+  .cover { text-align: center; padding: 60px 0 40px; border-bottom: 3px solid #2c3e50; margin-bottom: 40px; }
+  .cover h1 { font-size: 32px; color: #2c3e50; margin-bottom: 8px; }
+  .cover .subtitle { font-size: 16px; color: #7f8c8d; margin-bottom: 30px; }
+  .cover .meta { display: inline-block; text-align: left; background: #ecf0f1; padding: 16px 24px; border-radius: 6px; font-size: 14px; }
+  .cover .meta div { margin: 3px 0; }
+  .cover .meta strong { display: inline-block; min-width: 120px; }
+
+  /* Stats grid */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0 30px; }
+  .stat-card { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; text-align: center; }
+  .stat-card .num { font-size: 28px; font-weight: bold; }
+  .stat-card .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-top: 4px; }
+  .stat-card.green { background: #27ae60; }
+  .stat-card.blue { background: #2980b9; }
+  .stat-card.orange { background: #e67e22; }
+  .stat-card.purple { background: #8e44ad; }
+
+  /* Section headers */
+  h2 { font-size: 20px; border-bottom: 2px solid #3498db; padding-bottom: 6px; margin: 35px 0 15px; }
+  h3 { font-size: 16px; color: #34495e; margin: 15px 0 8px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+  th { background: #2c3e50; color: white; padding: 10px 12px; text-align: left; }
+  td { padding: 8px 12px; border-bottom: 1px solid #ecf0f1; }
+  tr:nth-child(even) td { background: #f8f9fa; }
+  tr:hover td { background: #eaf4fb; }
+
+  /* Status badges */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; color: white; }
+  .s200 { background: #27ae60; }
+  .s301, .s302 { background: #f39c12; }
+  .s404 { background: #e74c3c; }
+  .s403 { background: #c0392b; }
+  .sother { background: #7f8c8d; }
+
+  /* Tech bar chart */
+  .tech-bar { margin: 8px 0; display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .tech-name { min-width: 180px; color: #2c3e50; }
+  .tech-track { flex: 1; background: #ecf0f1; border-radius: 3px; height: 18px; }
+  .tech-fill { height: 100%; background: #3498db; border-radius: 3px; min-width: 4px; }
+  .tech-count { min-width: 30px; text-align: right; color: #7f8c8d; font-size: 12px; }
+
+  /* Port display */
+  .port-chip { display: inline-block; background: #eaf4fb; border: 1px solid #aed6f1; color: #1a5276; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin: 2px; font-family: monospace; }
+
+  /* Screenshot gallery */
+  .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 15px 0; }
+  .gallery-item { border: 1px solid #ddd; border-radius: 6px; overflow: hidden; }
+  .gallery-item img { width: 100%; height: 160px; object-fit: cover; display: block; }
+  .gallery-caption { padding: 8px 10px; font-size: 11px; background: #f8f9fa; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gallery-status { font-size: 10px; color: #27ae60; font-weight: 600; }
+
+  /* Footer */
+  .footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid #ecf0f1; text-align: center; font-size: 12px; color: #95a5a6; }
+
+  code { background: #2c3e50; color: #ecf0f1; padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- COVER -->
+  <div class="cover">
+    <h1>🔍 Recon Report</h1>
+    <div class="subtitle">Automated Attack Surface Mapping</div>
+    <div class="meta">
+      <div><strong>Target:</strong> {{ target }}</div>
+      <div><strong>Date:</strong> {{ report_date }}</div>
+      <div><strong>Tester:</strong> {{ tester }}</div>
+      <div><strong>Tool:</strong> recon-automation-pipeline v1.0</div>
+    </div>
+  </div>
+
+  <!-- STATS GRID -->
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="num">{{ stats.subdomains }}</div>
+      <div class="label">Subdomains</div>
+    </div>
+    <div class="stat-card green">
+      <div class="num">{{ stats.live_hosts }}</div>
+      <div class="label">Live Hosts</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="num">{{ stats.open_ports }}</div>
+      <div class="label">Open Ports</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="num">{{ stats.technologies }}</div>
+      <div class="label">Technologies</div>
+    </div>
+  </div>
+
+  <!-- EXECUTIVE SUMMARY -->
+  <h2>Executive Summary</h2>
+  <p>
+    This automated reconnaissance report covers the external attack surface of
+    <strong>{{ target }}</strong>, conducted on {{ report_date }}.
+    The pipeline discovered <strong>{{ stats.subdomains }} subdomains</strong>, of which
+    <strong>{{ stats.live_hosts }} are live</strong> and responding to HTTP/HTTPS requests.
+    Port scanning identified <strong>{{ stats.open_ports }} open ports</strong> across
+    {{ stats.hosts_scanned }} scanned hosts, and
+    <strong>{{ stats.technologies }} distinct technologies</strong> were fingerprinted
+    across the target's web infrastructure.
+  </p>
+  <p style="margin-top:10px;">
+    This report is intended as a starting point for manual investigation. Subdomains
+    and live hosts identified here should be reviewed for misconfiguration, exposed
+    administrative interfaces, outdated software versions, and access control issues.
+  </p>
+
+  <!-- LIVE HOSTS TABLE -->
+  <h2>Live Hosts ({{ stats.live_hosts }})</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>URL</th>
+        <th>Status</th>
+        <th>Title</th>
+        <th>Technologies</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for host in live_hosts %}
+      <tr>
+        <td><code>{{ host.url }}</code></td>
+        <td>
+          <span class="badge
+            {% if host.status_code == 200 %}s200
+            {% elif host.status_code in [301, 302] %}s301
+            {% elif host.status_code == 404 %}s404
+            {% elif host.status_code == 403 %}s403
+            {% else %}sother{% endif %}">
+            {{ host.status_code }}
+          </span>
+        </td>
+        <td>{{ host.title or "—" }}</td>
+        <td>{{ host.tech | join(", ") if host.tech else "—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- TECH DISTRIBUTION -->
+  <h2>Technology Distribution</h2>
+  {% if tech_distribution %}
+    {% set max_count = tech_distribution[0].host_count %}
+    {% for tech in tech_distribution[:15] %}
+    <div class="tech-bar">
+      <span class="tech-name">{{ tech.technology }}</span>
+      <div class="tech-track">
+        <div class="tech-fill" style="width: {{ (tech.host_count / max_count * 100) | int }}%"></div>
+      </div>
+      <span class="tech-count">{{ tech.host_count }}</span>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:#7f8c8d;">No technology data available. Run the tech module to populate this section.</p>
+  {% endif %}
+
+  <!-- PORT FINDINGS -->
+  <h2>Port Findings</h2>
+  {% if port_results %}
+    <table>
+      <thead>
+        <tr>
+          <th>Host</th>
+          <th>Open Ports</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in port_results %}
+        {% if entry.open_ports %}
+        <tr>
+          <td><code>{{ entry.host }}</code></td>
+          <td>
+            {% for port in entry.open_ports %}
+            <span class="port-chip">{{ port.port }}/{{ port.protocol }} {{ port.service }}</span>
+            {% endfor %}
+          </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p style="color:#7f8c8d;">No port data available. Run the ports module to populate this section.</p>
+  {% endif %}
+
+  <!-- SCREENSHOT GALLERY -->
+  <h2>Screenshot Gallery</h2>
+  {% if screenshots %}
+    <div class="gallery">
+      {% for item in screenshots %}
+      {% if item.captured and item.screenshot_path %}
+      <div class="gallery-item">
+        <img src="{{ item.screenshot_path }}" alt="{{ item.host }}"
+             onerror="this.style.display='none'">
+        <div class="gallery-caption">
+          <span class="gallery-status">✓</span>
+          {{ item.host or item.url }}
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="color:#7f8c8d;">No screenshots available. Run the screenshots module to populate this section.</p>
+  {% endif %}
+
+  <!-- SUBDOMAIN LIST -->
+  <h2>All Discovered Subdomains ({{ stats.subdomains }})</h2>
+  <table>
+    <thead>
+      <tr><th>Subdomain</th></tr>
+    </thead>
+    <tbody>
+      {% for sub in subdomains %}
+      <tr><td><code>{{ sub }}</code></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>Generated by recon-automation-pipeline v1.0 — {{ report_date }}</p>
+    <p>Built by {{ tester }} · <a href="https://github.com/puni8/recon-automation-pipeline">github.com/puni8/recon-automation-pipeline</a></p>
+  </div>
+
+</div>
+</body>
+</html>
